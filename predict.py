@@ -8,14 +8,15 @@ import math
 
 class Model:
 
-    def __init__(self,datafile='cleaned_turbine_data.xlsx'):
-        self.df=pd.read_excel('cleaned_turbine_data.xlsx')
+    def __init__(self,datafile='interview data.xlsx'):
+        self.df=pd.read_excel('interview data.xlsx')
+        self.df.columns=['TimeStamp','Generated watts','Exhaust temp','Comp Inlet Temp','Comp IGV angle','Comp discharge pressure','Comp discharge temp']
         self.df.set_index('TimeStamp',inplace=True)
-        self.df=self.df.drop(columns='Comp Inlet Temp')
+        self.df=self.df.drop(columns=['Comp Inlet Temp','Comp discharge temp'])
         self.regressor=DecisionTreeRegressor()
 
     def split(self):
-        X=self.df.loc[:,'Exhaust temp':'Comp discharge temp']
+        X=self.df.loc[:,['Exhaust temp','Comp discharge pressure','Comp IGV angle']]
         y=self.df.loc[:,'Generated watts']
         self.X_train,self.X_test,self.y_train,self.y_test=train_test_split(X,y,test_size=0.2,random_state=42)
 
@@ -39,6 +40,6 @@ def calculate_generated_power(input_data):
     model=Model()
     model.split()
     model.fit()
-    # input_value=[1100.11,57.32,113.05,644.57]
     return model.predict(input_data)
 
+# calculate_generated_power([1100.23,112.8,57.3])
